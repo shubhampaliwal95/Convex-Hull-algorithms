@@ -12,4 +12,4 @@ To execute-
 
 1)Execute GUI.py to give inputs visually. 
 
-2)Execute output.py to see the results.
+2)Execute Output.py to see the results.
