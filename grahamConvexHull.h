@@ -6,14 +6,14 @@
 #include<stdio.h>
 #include<vector>
 #include<iomanip>
+
 #include "point.h"
 
 using namespace std;
 
-// global Point to use as reference for the sorting of other points
-Point base;
+Point base;/** This global point is used as the reference for sorting other Points of the array */
 
-// function used by qsort() to sort an array of points with respect to the first point
+/** Comparator function called by the qsort() function in order to sort the Points in given array */
 int cmp(const void *vp1, const void *vp2)
 {
    Point *p1 = (Point *)vp1;
@@ -31,10 +31,10 @@ class GrahamConvexHull
 {
 public:
 
-    int n;
-    Point points[100];
+    int n;/**< number of points */
+    Point points[100005];/**< array of Points */
 
-    // constructor to create an object with parameters as number of points and the points themselves
+    /** Parameterised constructor of GrahamConvehHull used to create an object with parameters as number of points and the data points */
     GrahamConvexHull (int a, Point *p)
     {
         n=a;
@@ -42,11 +42,13 @@ public:
             points[i]=p[i];
     }
 
-    int m=1;
-    vector<Point> vec;
-    int vsize = 0;
+    int m=1;/** Size of modified array */
+    vector<Point> vec;/** Vector to manipulate the data points and store the final points of the Convex Hull */
+    int vsize = 0;/** Variable to hold the size of vector instead of continuously calling vector.size() function */
 
-    // function to find the base point i.e the point with the least y-coordinate and then sort the other points with respect to the increasing counterclockwise polar angle between them and the base point
+    /** This function is used to find the Base Point i.e the point with the least y-coordinate. If there are more 
+    than one such points, we choose the one with the least x-coordinate from amongst them. We then sort the other points with 
+    respect to the base point in the increasing order of the counterclockwise polar angle between that point and the base point. */
     void getBaseAndSort()
     {
         int y_min = points[0].y;
@@ -62,13 +64,18 @@ public:
             }
         }
 
-        // swap the first point of array with the obtained base point
+        /** swapping the first point of array with the obtained base point */
         swap(points[0], points[pos_min]);
         base = points[0];
+
+        /** sorting the array points using inbuilt function qsort() whose comparator function has been defined previously */
         qsort(&points[1], n-1, sizeof(Point), cmp);
     }
 
-    // function to find points which have the same polar angle with the base point and only retain the furthest in distance of all those points
+    /** This function is used to find points which have the same polar angle with the Base Point. If there are are more than 
+    1 point with the same polar angle, we retain only that one with the maximum squared euclidian distance from the Base Point 
+    and discard all other points. The function return -1 if there are less than 3 points left after the  modification of the array 
+    which denotes that a Convex Hull is not possible, else returns 0. */
     int modifyArray()
     {
         for (int i=1; i<n; i++)
@@ -80,17 +87,20 @@ public:
             m++;
         }
 
-        // if there are less than 3 points after modification, then a convex hull is not possible
+        /** If there are less than 3 points after modification, then a convex hull is not possible and the program will end abruptly after printing the error. */
         if(m<3)
             return -1;
 
         return 0;
     }
 
-    // function to iterate through the modified array and remove points which do not have a counterclockwise orientation with respect to the 'previous' and 'current' point.
+    /** In this function, we denote a 'current' and 'previous' point which are the last element of vector and next-to-last element 
+    of the vector respectively. We then iterate through the modified array and remove points which do not have a counterclockwise orientation 
+    with respect to the 'previous' and 'current' point. The previous and current are updated after each popping operation. If a point does have a
+    counterclockwise orientation, then it is pushed onto the vector. */
     void acceptPoints()
     {
-        // push the first three points into the solution vector
+        /** Push the first three points of the modified array into the solution vector */
         vec.push_back(points[0]);
         vec.push_back(points[1]);
         vec.push_back(points[2]);
@@ -103,21 +113,23 @@ public:
 
             while(previous.orientation(current, points[i]) != -1)
             {
+                /** Pop current if the point does not have a counterclockwise orientation with the triplet(previous, current, new). */
                 vec.pop_back();
                 vsize--;
 
-                //update the current and previous points
+                /** Update the current and previous variables */
                 previous = vec[vsize-2];
                 current = vec[vsize-1];
             }
 
-            // add new point to solution vector when it makes a counterclockwise orientation wrt current and previous
+            /** Add new point to solution vector when it makes a counterclockwise orientation with respect to current and previous points. */
             vec.push_back(points[i]);
             vsize++;
         }
     }
 
-    // function to print the points from solution vector which are part of the Convex Hull
+    /** This function is used to print the points from the solution vector which make up the Convex Hull. We keep popping points from
+    the vector and printing them till the vector is empty. */
     void printHull()
     {
         while(vec.empty() == false)

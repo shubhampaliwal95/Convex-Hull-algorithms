@@ -15,7 +15,7 @@ ax.yaxis.set_ticks(np.arange(1,10,0.5))
 ax.set_title('Convex Hull input')					
 ax.set_xlabel('x')
 ax.set_ylabel('y')
-
+sys.setrecursionlimit(1500)
 fx = open("Input.txt","w")										#fx as a reader of input file
 def onclick(event):												#Action listener to record coordinates of mouse click
     
